@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "tsx watch src/tugas/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js",
+    "start": "node dist/tugas/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -32,8 +32,8 @@
   },
   "imports": {
     "#*":{
-      "default": "./dist/*.js",
-      "types": "./src/*.ts"
+      "default": "./dist/tugas/*.js",
+      "types": "./src/tugas/*.ts"
     }
   }
 }
