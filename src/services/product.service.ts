@@ -3,22 +3,33 @@ import type { Prisma, Product } from "@prisma/client";
 
 export class ProductService {
   static async getAll(): Promise<Product[]> {
-    return await prisma.product.findMany();
+    return prisma.product.findMany({
+      where: { deletedAt: null },
+    });
   }
 
   static async getById(id: number): Promise<Product> {
-    const product = await prisma.product.findUnique({ where: { id } });
-    if (!product) throw new Error("Produk tidak ditemukan");
+    const product = await prisma.product.findFirst({
+      where: { id, deletedAt: null },
+    });
+
+    if (!product) {
+      throw new Error("Produk tidak ditemukan");
+    }
+
     return product;
   }
 
   static async create(data: {
     name: string;
-    description: string;
+    description?: string;
     price: number;
     stock: number;
+    categoryId?: number;
   }): Promise<Product> {
-    return await prisma.product.create({ data });
+    return prisma.product.create({
+      data,
+    });
   }
 
   static async update(
@@ -28,21 +39,39 @@ export class ProductService {
       description?: string;
       price?: number;
       stock?: number;
+      categoryId?: number;
     },
   ): Promise<Product> {
     await this.getById(id);
-    return await prisma.product.update({ where: { id }, data });
+
+    return prisma.product.update({
+      where: { id },
+      data,
+    });
   }
 
   static async delete(id: number): Promise<Product> {
     await this.getById(id);
-    return await prisma.product.delete({ where: { id } });
+
+    return prisma.product.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    });
   }
 
   static async search(name?: string, maxPrice?: number): Promise<Product[]> {
-    const where: Prisma.ProductWhereInput = {};
-    if (name) where.name = { contains: name };
-    if (maxPrice) where.price = { lte: maxPrice };
-    return await prisma.product.findMany({ where });
+    const where: Prisma.ProductWhereInput = {
+      deletedAt: null,
+    };
+
+    if (name) {
+      where.name = { contains: name, mode: "insensitive" };
+    }
+
+    if (maxPrice !== undefined) {
+      where.price = { lte: maxPrice };
+    }
+
+    return prisma.product.findMany({ where });
   }
 }
