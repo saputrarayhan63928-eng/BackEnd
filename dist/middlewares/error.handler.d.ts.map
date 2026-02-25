@@ -1,0 +1,1 @@
+{"version":3,"file":"error.handler.d.ts","sourceRoot":"","sources":["../../src/middlewares/error.handler.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,KAAK,OAAO,EAAE,KAAK,QAAQ,EAAE,KAAK,YAAY,EAAE,MAAM,SAAS,CAAC;AAIzE,eAAO,MAAM,YAAY,GAAI,KAAK,GAAG,EAAE,MAAM,OAAO,EAAE,KAAK,QAAQ,EAAE,OAAO,YAAY,SAQvF,CAAC"}
