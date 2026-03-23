@@ -6,6 +6,7 @@ import productRoutes from './routes/product.route';
 import { errorHandler } from './middlewares/error.handler';
 import categoryRoutes from './routes/category.route';
 import transactionRouter from './routes/transaction.route'
+import authRouter from './routes/auth.route'
 
 const app = express();
 
@@ -34,6 +35,8 @@ app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
 
 app.use('/api/transaction', transactionRouter);
+
+app.use('/api/v1', authRouter)
 
 // Error handler harus di paling bawah!
 // Middleware error handling dengan 4 parameter (`err, req, res, next`) harus selalu 

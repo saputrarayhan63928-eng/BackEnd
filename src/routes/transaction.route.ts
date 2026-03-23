@@ -1,9 +1,10 @@
 import { Router } from "express";
 import { checkout, getDetail } from "../controllers/transaction.controller";
+import { authenticate } from "../middlewares/auth.middleware";
 
-const router = Router()
+const router = Router();
 
-router.post("/checkout", checkout)
-router.get("/:id", getDetail)
+router.post("/checkout", authenticate, checkout);
+router.get("/:id", getDetail);
 
-export default router
+export default router;
