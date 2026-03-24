@@ -26,9 +26,21 @@ export class ProductService {
     price: number;
     stock: number;
     categoryId?: number;
+    image: string;
   }): Promise<Product> {
+    const { categoryId, ...productData } = data;
+
     return prisma.product.create({
-      data,
+      data: {
+        ...productData,
+        ...(categoryId
+          ? {
+              category: {
+                connect: { id: categoryId },
+              },
+            }
+          : {}),
+      },
     });
   }
 
@@ -40,13 +52,29 @@ export class ProductService {
       price?: number;
       stock?: number;
       categoryId?: number;
+      image?: string;
     },
   ): Promise<Product> {
     await this.getById(id);
 
+    const { categoryId, ...productData } = data;
+
     return prisma.product.update({
       where: { id },
-      data,
+      data: {
+        ...productData,
+        ...(categoryId !== undefined
+          ? {
+              category: categoryId
+                ? {
+                    connect: { id: categoryId },
+                  }
+                : {
+                    disconnect: true,
+                  },
+            }
+          : {}),
+      },
     });
   }
 
