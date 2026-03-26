@@ -33,7 +33,7 @@ export const createProductValidation = [
     .isFloat({ gt: 0 }).withMessage('Price harus angka > 0'),
 
   body('stock')
-    .notEmpty().withMessage('Stock wajib diisi')
+    .optional()
     .isInt({ min: 0 }).withMessage('Stock harus integer >= 0')
 ];
 

@@ -2,6 +2,7 @@ import express from 'express';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import cors from 'cors';
+import path from 'path';
 import productRoutes from './routes/product.route';
 import { errorHandler } from './middlewares/error.handler';
 import categoryRoutes from './routes/category.route';
@@ -14,6 +15,7 @@ app.use(helmet());
 app.use(cors());
 app.use(morgan('dev'));
 app.use(express.json());
+app.use('/public/uploads', express.static(path.resolve('public/uploads')));
 
 // Custom middleware (dari Hari 4)
 app.use((req, res, next) => {
@@ -30,7 +32,7 @@ app.get('/', (req, res) => {
   res.json({ message: `Halo pemilik API Key: ${req.apiKey}! Hari 5 – MVC E-Commerce + Service`, waktu_proses: `${waktu}ms` });
 });
 
-app.use('/api/products', productRoutes);
+app.use('/api/v1/products', productRoutes);
 
 app.use('/api/categories', categoryRoutes);
 

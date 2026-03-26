@@ -49,8 +49,8 @@ export const createProduct = asyncHandler(async (req: Request, res: Response) =>
   const productData = {
     ...req.body,
     price: Number(req.body.price),
-    stock: Number(req.body.stock),
-    categoryId: Number(req.body.categoryId),
+    stock: req.body.stock !== undefined ? Number(req.body.stock) : 0,
+    categoryId: req.body.categoryId !== undefined ? Number(req.body.categoryId) : undefined,
     image: imageUrl,
   };
 
