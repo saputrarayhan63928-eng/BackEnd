@@ -12,6 +12,7 @@ export declare class TransactionService {
                 description: string | null;
                 price: import("@prisma/client-runtime-utils").Decimal;
                 stock: number;
+                image: string;
                 categoryId: number | null;
                 deletedAt: Date | null;
             };
@@ -38,6 +39,8 @@ export declare class TransactionService {
             updatedAt: Date;
             deletedAt: Date | null;
             email: string;
+            password: string;
+            role: string;
         };
         item: ({
             product: {
@@ -48,6 +51,7 @@ export declare class TransactionService {
                 description: string | null;
                 price: import("@prisma/client-runtime-utils").Decimal;
                 stock: number;
+                image: string;
                 categoryId: number | null;
                 deletedAt: Date | null;
             };

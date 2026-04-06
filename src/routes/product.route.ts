@@ -5,7 +5,7 @@ import {
   createProduct,
   updateProduct,
   deleteProduct,
-  searchProducts,
+  // searchProducts,
 } from "../controllers/product.controller";
 import {
   validate,
@@ -19,7 +19,7 @@ import { authenticate } from "../middlewares/auth.middleware";
 const router = Router();
 
 router.get("/", getAllProducts);
-router.get("/search", searchProducts); // Route search harus sebelum :id
+// router.get("/search", searchProducts); // Route search harus sebelum :id
 router.get("/:id", validate(getProductByIdValidation), getProductById);
 router.post('/', 
   authenticate,
