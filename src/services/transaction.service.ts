@@ -1,6 +1,73 @@
 import prisma from "../utils/prisma";
+import type { Prisma } from "@prisma/client";
+
+interface FindAllParams {
+    page: number;
+    limit: number;
+    search?: {
+        userId?: number;
+        minTotal?: number;
+        maxTotal?: number;
+    };
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+}
+
+const allowedSortFields = ["id", "total", "createdAt", "updatedAt"] as const;
+type AllowedSortField = (typeof allowedSortFields)[number];
 
 export class TransactionService {
+    static async getAll(params: FindAllParams) {
+        const { page, limit, search, sortBy, sortOrder } = params
+        const skip = (page - 1) * limit
+        const orderByField: AllowedSortField = allowedSortFields.includes(
+            sortBy as AllowedSortField,
+        )
+            ? (sortBy as AllowedSortField)
+            : "createdAt"
+
+        const whereClause: Prisma.TransactionWhereInput = {
+            deletedAt: null,
+        }
+
+        if (search?.userId) {
+            whereClause.userId = search.userId
+        }
+
+        if (search?.minTotal !== undefined || search?.maxTotal !== undefined) {
+            whereClause.total = {
+                ...(search.minTotal !== undefined ? { gte: search.minTotal } : {}),
+                ...(search.maxTotal !== undefined ? { lte: search.maxTotal } : {}),
+            }
+        }
+
+        const transactions = await prisma.transaction.findMany({
+            skip,
+            take: limit,
+            where: whereClause,
+            orderBy: { [orderByField]: sortOrder || "desc" },
+            include: {
+                user: true,
+                item: {
+                    include: {
+                        product: true,
+                    },
+                },
+            },
+        })
+
+        const totalItems = await prisma.transaction.count({
+            where: whereClause,
+        })
+
+        return {
+            transactions,
+            totalItems,
+            totalPages: Math.ceil(totalItems / limit),
+            currentPage: page,
+        }
+    }
+
     static async checkout(userId: number, items:{productId: number, quantity: number}[])  {
         return await prisma.$transaction(async (tx) => {
             let total = 0
