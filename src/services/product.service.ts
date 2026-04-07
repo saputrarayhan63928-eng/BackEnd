@@ -1,3 +1,4 @@
+import { countAll, findAll,create, update, softDelete } from "../repository/product.repository";
 import prisma from "../utils/prisma";
 import type { Prisma, Product } from "@prisma/client";
 
@@ -48,22 +49,13 @@ export class ProductService {
       }
     }
 
+    const sortCriteria: Prisma.ProductOrderByWithRelationInput = sortBy ? {[ sortBy] : sortOrder || "desc"} : {createdAt: "desc"}
+
     //  Ambil data dgn pagination and sorting
-    const products = await prisma.product.findMany({
-      skip: skip,
-      take: limit,
-      where: whereClause,
-      // gunakan array untuk orderBy agar dinamis
-      orderBy: { [orderByField]: sortOrder || "desc" },
-      include: {
-        category: true
-      }
-    })
+    const products = await findAll(skip,limit,whereClause,sortCriteria)
 
     // hitung total data (untuk metadata pagination)
-    const totalItems = await prisma.product.count({
-      where: whereClause
-    })
+    const totalItems = await countAll(whereClause)
 
     return {
       products,
@@ -85,71 +77,28 @@ export class ProductService {
     return product;
   }
 
-  static async create(data: {
-    name: string;
-    description?: string;
-    price: number;
-    stock: number;
-    categoryId?: number;
-    image: string;
-  }): Promise<Product> {
-    const { categoryId, ...productData } = data;
-
-    return prisma.product.create({
-      data: {
-        ...productData,
-        ...(categoryId
-          ? {
-              category: {
-                connect: { id: categoryId },
-              },
-            }
-          : {}),
-      },
-    });
+  static async create(data: any): Promise<Product> {
+    if(data.stock < 0) throw new Error ('Stock Tidak boleh Negatif')
+    if(data.price < 0 ) throw new Error ('Stock Tidak boleh Negatif')
+      return await create(data)
   }
 
   static async update(
     id: number,
-    data: {
-      name?: string;
-      description?: string;
-      price?: number;
-      stock?: number;
-      categoryId?: number;
-      image?: string;
-    },
+    data: any,
   ): Promise<Product> {
     await this.getById(id);
 
-    const { categoryId, ...productData } = data;
+    if(data.stock < 0) throw new Error ('Stock Tidak boleh Negatif')
+    if(data.price < 0 ) throw new Error ('Stock Tidak boleh Negatif')
 
-    return prisma.product.update({
-      where: { id },
-      data: {
-        ...productData,
-        ...(categoryId !== undefined
-          ? {
-              category: categoryId
-                ? {
-                    connect: { id: categoryId },
-                  }
-                : {
-                    disconnect: true,
-                  },
-            }
-          : {}),
-      },
-    });
+      return await update(id,data)
   }
 
   static async delete(id: number): Promise<Product> {
     await this.getById(id);
 
-    return prisma.product.update({
-      where: { id },
-      data: { deletedAt: new Date() },
-    });
+    return softDelete(id)
   }
 
   // static async search(name?: string, maxPrice?: number): Promise<Product[]> {
