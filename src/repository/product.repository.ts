@@ -39,3 +39,21 @@ export const softDelete = async (id:number) => {
         data: {deletedAt: new Date()}
     })
 }
+
+// export class ProductRepository {
+//     async findComplex(categoryName: string, maxPrice: number) {
+//         return await prisma.product.findMany({
+//             where: {
+//                 OR: [
+//                     {
+//                         AND: [
+//                             {category: {name: categoryName}},
+//                             {price: {lt: maxPrice}}
+//                         ]
+//                     },
+//                     {category: {name: 'Aksesoris'}}
+//                 ]
+//             }
+//         })
+//     }
+// }
