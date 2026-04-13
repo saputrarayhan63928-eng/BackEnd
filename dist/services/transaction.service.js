@@ -1,5 +1,48 @@
 import prisma from "../utils/prisma";
+const allowedSortFields = ["id", "total", "createdAt", "updatedAt"];
 export class TransactionService {
+    static async getAll(params) {
+        const { page, limit, search, sortBy, sortOrder } = params;
+        const skip = (page - 1) * limit;
+        const orderByField = allowedSortFields.includes(sortBy)
+            ? sortBy
+            : "createdAt";
+        const whereClause = {
+            deletedAt: null,
+        };
+        if (search?.userId) {
+            whereClause.userId = search.userId;
+        }
+        if (search?.minTotal !== undefined || search?.maxTotal !== undefined) {
+            whereClause.total = {
+                ...(search.minTotal !== undefined ? { gte: search.minTotal } : {}),
+                ...(search.maxTotal !== undefined ? { lte: search.maxTotal } : {}),
+            };
+        }
+        const transactions = await prisma.transaction.findMany({
+            skip,
+            take: limit,
+            where: whereClause,
+            orderBy: { [orderByField]: sortOrder || "desc" },
+            include: {
+                user: true,
+                item: {
+                    include: {
+                        product: true,
+                    },
+                },
+            },
+        });
+        const totalItems = await prisma.transaction.count({
+            where: whereClause,
+        });
+        return {
+            transactions,
+            totalItems,
+            totalPages: Math.ceil(totalItems / limit),
+            currentPage: page,
+        };
+    }
     static async checkout(userId, items) {
         return await prisma.$transaction(async (tx) => {
             let total = 0;

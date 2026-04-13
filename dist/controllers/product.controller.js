@@ -1,5 +1,5 @@
 import {} from "express";
-import { ProductService } from "../services/product.service";
+import { ProductService, ProductServiceV2 } from "../services/product.service";
 import { asyncHandler } from "../utils/async.handler";
 import { successResponse } from "../utils/response";
 export const getAllProducts = asyncHandler(async (req, res) => {
@@ -111,4 +111,76 @@ export const deleteProduct = asyncHandler(async (req, res) => {
 //   return successResponse(res, "Hasil pencarian", products);
 // },
 // );
+export class ProductControllerV2 {
+    productService;
+    constructor(productService) {
+        this.productService = productService;
+    }
+    // Arrow function untuk binding 'this' otomatis
+    getProducts = async (req, res, next) => {
+        try {
+            const products = await this.productService.getAllProducts();
+            res.json({
+                success: true,
+                data: products
+            });
+        }
+        catch (error) {
+            next(error);
+        }
+    };
+    getProduct = async (req, res, next) => {
+        try {
+            const id = parseInt(req.params.id);
+            const product = await this.productService.getProductById(id);
+            res.json({
+                success: true,
+                data: product
+            });
+        }
+        catch (error) {
+            next(error);
+        }
+    };
+    createProduct = async (req, res, next) => {
+        try {
+            const product = await this.productService.createProduct(req.body);
+            res.status(201).json({
+                success: true,
+                data: product,
+                message: 'Product created successfully'
+            });
+        }
+        catch (error) {
+            next(error);
+        }
+    };
+    updateProduct = async (req, res, next) => {
+        try {
+            const id = parseInt(req.params.id);
+            const product = await this.productService.updateProduct(id, req.body);
+            res.json({
+                success: true,
+                data: product,
+                message: 'Product updated successfully'
+            });
+        }
+        catch (error) {
+            next(error);
+        }
+    };
+    deleteProduct = async (req, res, next) => {
+        try {
+            const id = parseInt(req.params.id);
+            await this.productService.deleteProduct(id);
+            res.json({
+                success: true,
+                message: 'Product deleted successfully'
+            });
+        }
+        catch (error) {
+            next(error);
+        }
+    };
+}
 //# sourceMappingURL=product.controller.js.map

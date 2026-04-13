@@ -1,10 +1,15 @@
-import { Router } from 'express';
-import { listCategories, addCategory } from '../controllers/category.controller';
-// Jangan lupa buat validasi untuk kategori juga!
+import { Router } from "express";
+import { CategoryController } from "../controllers/category.controller";
+import { CategoryRepository } from "../repository/category.repository";
+import { CategoryService } from "../services/category.service";
 
 const router = Router();
 
-router.get('/', listCategories);
-router.post('/', addCategory);
+const categoryRepository = new CategoryRepository();
+const categoryService = new CategoryService(categoryRepository);
+const categoryController = new CategoryController(categoryService);
+
+router.get("/", categoryController.listCategories);
+router.post("/", categoryController.addCategory);
 
 export default router;
