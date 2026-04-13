@@ -1,4 +1,7 @@
+import { countAll, findAll, create, update, softDelete, ProductRepository } from "../repository/product.repository";
 import prisma from "../utils/prisma";
+import {} from "../models/product.mode";
+import { error } from "node:console";
 const allowedSortFields = [
     "id",
     "name",
@@ -7,6 +10,49 @@ const allowedSortFields = [
     "createdAt",
     "updatedAt",
 ];
+export class ProductServiceV2 {
+    repository;
+    constructor(repository) {
+        this.repository = repository;
+    }
+    async getAllProducts() {
+        return await this.repository.findAll();
+    }
+    async getProductById(id) {
+        const product = await this.repository.findById(id);
+        if (!product) {
+            throw new Error(`Product with id ${id} not found`);
+        }
+        return product;
+    }
+    async createProduct(data) {
+        // Business logic: validasi
+        if (data.price <= 0) {
+            throw new Error('Price must be greater than 0');
+        }
+        if (data.stock < 0) {
+            throw new Error('Stock cannot be negative');
+        }
+        return await this.repository.create(data);
+    }
+    async updateProduct(id, data) {
+        const product = await this.repository.update(id, data);
+        if (!product) {
+            throw new Error(`Product with id ${id} not found`);
+        }
+        return product;
+    }
+    async deleteProduct(id) {
+        const deleted = await this.repository.delete(id);
+        if (!deleted) {
+            throw new Error(`Product with id ${id} not found`);
+        }
+    }
+    async checkStock(id) {
+        const product = await this.getProductById(id);
+        return (product.stock ?? 0) > 0;
+    }
+}
 export class ProductService {
     static async getAll(params) {
         const { page, limit, search, sortBy, sortOrder } = params;
@@ -26,21 +72,11 @@ export class ProductService {
                 lte: search.maxPrice
             };
         }
+        const sortCriteria = sortBy ? { [sortBy]: sortOrder || "desc" } : { createdAt: "desc" };
         //  Ambil data dgn pagination and sorting
-        const products = await prisma.product.findMany({
-            skip: skip,
-            take: limit,
-            where: whereClause,
-            // gunakan array untuk orderBy agar dinamis
-            orderBy: { [orderByField]: sortOrder || "desc" },
-            include: {
-                category: true
-            }
-        });
+        const products = await findAll(skip, limit, whereClause, sortCriteria);
         // hitung total data (untuk metadata pagination)
-        const totalItems = await prisma.product.count({
-            where: whereClause
-        });
+        const totalItems = await countAll(whereClause);
         return {
             products,
             totalItems,
@@ -58,47 +94,23 @@ export class ProductService {
         return product;
     }
     static async create(data) {
-        const { categoryId, ...productData } = data;
-        return prisma.product.create({
-            data: {
-                ...productData,
-                ...(categoryId
-                    ? {
-                        category: {
-                            connect: { id: categoryId },
-                        },
-                    }
-                    : {}),
-            },
-        });
+        if (data.stock < 0)
+            throw new Error('Stock Tidak boleh Negatif');
+        if (data.price < 0)
+            throw new Error('Stock Tidak boleh Negatif');
+        return await create(data);
     }
     static async update(id, data) {
         await this.getById(id);
-        const { categoryId, ...productData } = data;
-        return prisma.product.update({
-            where: { id },
-            data: {
-                ...productData,
-                ...(categoryId !== undefined
-                    ? {
-                        category: categoryId
-                            ? {
-                                connect: { id: categoryId },
-                            }
-                            : {
-                                disconnect: true,
-                            },
-                    }
-                    : {}),
-            },
-        });
+        if (data.stock < 0)
+            throw new Error('Stock Tidak boleh Negatif');
+        if (data.price < 0)
+            throw new Error('Stock Tidak boleh Negatif');
+        return await update(id, data);
     }
     static async delete(id) {
         await this.getById(id);
-        return prisma.product.update({
-            where: { id },
-            data: { deletedAt: new Date() },
-        });
+        return softDelete(id);
     }
 }
 //# sourceMappingURL=product.service.js.map

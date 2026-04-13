@@ -1,4 +1,6 @@
+import { ProductRepository } from "../repository/product.repository";
 import type { Prisma, Product } from "@prisma/client";
+import { type IProduct, type ICreateProduct, type IUpdateProduct } from "../models/product.mode";
 interface FindAllParams {
     page: number;
     limit: number;
@@ -8,6 +10,16 @@ interface FindAllParams {
     };
     sortBy?: string;
     sortOrder?: "asc" | "desc";
+}
+export declare class ProductServiceV2 {
+    private repository;
+    constructor(repository: ProductRepository);
+    getAllProducts(): Promise<IProduct[]>;
+    getProductById(id: number): Promise<IProduct>;
+    createProduct(data: ICreateProduct): Promise<IProduct>;
+    updateProduct(id: number, data: IUpdateProduct): Promise<IProduct>;
+    deleteProduct(id: number): Promise<void>;
+    checkStock(id: number): Promise<boolean>;
 }
 export declare class ProductService {
     static getAll(params: FindAllParams): Promise<{
@@ -35,22 +47,8 @@ export declare class ProductService {
         currentPage: number;
     }>;
     static getById(id: number): Promise<Product>;
-    static create(data: {
-        name: string;
-        description?: string;
-        price: number;
-        stock: number;
-        categoryId?: number;
-        image: string;
-    }): Promise<Product>;
-    static update(id: number, data: {
-        name?: string;
-        description?: string;
-        price?: number;
-        stock?: number;
-        categoryId?: number;
-        image?: string;
-    }): Promise<Product>;
+    static create(data: any): Promise<Product>;
+    static update(id: number, data: any): Promise<Product>;
     static delete(id: number): Promise<Product>;
 }
 export {};
