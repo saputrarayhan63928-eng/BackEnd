@@ -1,81 +1,95 @@
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { TransactionService } from "../services/transaction.service";
 import { errorResponse, successResponse } from "../utils/response";
 
-export const listTransactions = async (req: Request, res: Response) => {
-  try {
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 10;
-    const userIdValue = req.query.userId;
-    const minTotalValue = req.query.minTotal;
-    const maxTotalValue = req.query.maxTotal;
-    const sortBy = req.query.sortBy as string | undefined;
-    const sortOrderValue = req.query.sortOrder as string | undefined;
-    const sortOrder =
-      sortOrderValue === "asc" || sortOrderValue === "desc"
-        ? sortOrderValue
-        : undefined;
+export class TransactionController {
+  constructor(private readonly transactionService: TransactionService) {}
 
-    const params: {
-      page: number;
-      limit: number;
-      search?: { userId?: number; minTotal?: number; maxTotal?: number };
-      sortBy?: string;
-      sortOrder?: "asc" | "desc";
-    } = { page, limit };
+  listTransactions = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const page = Number(req.query.page) || 1;
+      const limit = Number(req.query.limit) || 10;
+      const userIdValue = req.query.userId;
+      const minTotalValue = req.query.minTotal;
+      const maxTotalValue = req.query.maxTotal;
+      const sortBy = req.query.sortBy as string | undefined;
+      const sortOrderValue = req.query.sortOrder as string | undefined;
+      const sortOrder =
+        sortOrderValue === "asc" || sortOrderValue === "desc"
+          ? sortOrderValue
+          : undefined;
 
-    if (
-      userIdValue !== undefined ||
-      minTotalValue !== undefined ||
-      maxTotalValue !== undefined
-    ) {
-      params.search = {};
+      const result = await this.transactionService.getAllTransactions({
+        page,
+        limit,
+        ...(userIdValue !== undefined ||
+        minTotalValue !== undefined ||
+        maxTotalValue !== undefined
+          ? {
+              search: {
+                ...(userIdValue !== undefined ? { userId: Number(userIdValue) } : {}),
+                ...(minTotalValue !== undefined
+                  ? { minTotal: Number(minTotalValue) }
+                  : {}),
+                ...(maxTotalValue !== undefined
+                  ? { maxTotal: Number(maxTotalValue) }
+                  : {}),
+              },
+            }
+          : {}),
+        ...(sortBy ? { sortBy } : {}),
+        ...(sortOrder ? { sortOrder } : {}),
+      });
 
-      if (userIdValue !== undefined) params.search.userId = Number(userIdValue);
-      if (minTotalValue !== undefined) {
-        params.search.minTotal = Number(minTotalValue);
+      return successResponse(
+        res,
+        "Daftar transaksi berhasil diambil",
+        result.transactions,
+        {
+          page: result.currentPage,
+          limit,
+          total: result.totalItems,
+        },
+      );
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  checkout = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      if (!req.user?.id) {
+        return errorResponse(res, "Unauthorized", 401);
       }
-      if (maxTotalValue !== undefined) {
-        params.search.maxTotal = Number(maxTotalValue);
+
+      const items = Array.isArray(req.body.item) ? req.body.item : [];
+      const result = await this.transactionService.checkout(
+        req.user.id,
+        items.map((item: { productId: unknown; quantity: unknown }) => ({
+          productId: Number(item.productId),
+          quantity: Number(item.quantity),
+        })),
+      );
+
+      return successResponse(res, "Checkout Success", result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getDetail = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const result = await this.transactionService.getTransactionById(
+        Number(req.params.id),
+      );
+
+      if (!result) {
+        return errorResponse(res, "Transaction not found", 404);
       }
+
+      return successResponse(res, "Get transaction request sucses", result);
+    } catch (error) {
+      next(error);
     }
-
-    if (sortBy) params.sortBy = sortBy;
-    if (sortOrder) params.sortOrder = sortOrder;
-
-    const result = await TransactionService.getAll(params);
-    return successResponse(res, "Daftar transaksi berhasil diambil", result.transactions, {
-      page: result.currentPage,
-      limit,
-      total: result.totalItems,
-    });
-  } catch (error) {
-    return errorResponse(res, `Error retrieval: ${error}`, 500);
-  }
-};
-
-export const checkout = async (req: Request, res: Response) => {
-  try {
-    const { item } = req.body;
-
-    if (!req.user?.id) {
-      return errorResponse(res, "Unauthorized", 401);
-    }
-
-    const result = await TransactionService.checkout(req.user.id, item);
-    return successResponse(res, "Checkout Success", result, null, 200);
-  } catch (error) {
-    return errorResponse(res, `Checkout failed: ${error}`, 500);
-  }
-};
-
-export const getDetail = async (req: Request, res: Response) =>{
-    try{
-        const {id} = req.params
-        const result = await TransactionService.getTransactionById(Number(id))
-        if(!result) return errorResponse(res, "Transaction not found", 404)
-        return successResponse(res, "Get transaction request sucses", result,null,200)
-    } catch(error){
-        return errorResponse(res, `Error retrieval: ${error}`, 500) 
-    }
+  };
 }

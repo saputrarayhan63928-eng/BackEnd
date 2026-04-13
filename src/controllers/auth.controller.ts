@@ -1,27 +1,38 @@
-import { type Request, type Response } from "express";
-import * as AuthService from "../services/auth.service";
-import { asyncHandler } from "../utils/async.handler";
+import type { NextFunction, Request, Response } from "express";
+import { AuthService } from "../services/auth.service";
 import { successResponse } from "../utils/response";
 
-export const register = asyncHandler(async (req: Request, res: Response) => {
-  const user = await AuthService.register(req.body);
-  const { password, ...userWithoutPassword } = user;
+export class AuthController {
+  constructor(private readonly authService: AuthService) {}
 
-  return successResponse(
-    res,
-    "Register berhasil",
-    userWithoutPassword,
-    null,
-    201
-  );
-});
+  register = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = await this.authService.register(req.body);
+      const { password, ...userWithoutPassword } = user;
 
-export const login = asyncHandler(async (req: Request, res: Response) => {
-  const result = await AuthService.login(req.body);
-  const { password, ...userWithoutPassword } = result.user;
+      return successResponse(
+        res,
+        "Register berhasil",
+        userWithoutPassword,
+        null,
+        201,
+      );
+    } catch (error) {
+      next(error);
+    }
+  };
 
-  return successResponse(res, "Login Berhasil", {
-    user: userWithoutPassword,
-    token: result.token,
-  });
-});
+  login = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const result = await this.authService.login(req.body);
+      const { password, ...userWithoutPassword } = result.user;
+
+      return successResponse(res, "Login Berhasil", {
+        user: userWithoutPassword,
+        token: result.token,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+}
