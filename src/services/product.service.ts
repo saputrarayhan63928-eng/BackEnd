@@ -148,4 +148,15 @@ export class ProductService {
     await this.getProductById(id);
     return this.repository.softDelete(id);
   }
+
+  async execute(){
+    const stats = await this.repository.getStatistics()
+    const categoryStats = await this.repository.getProductsByCategotyStats()
+
+    return {
+      overview: stats,
+      byCategory: categoryStats
+    }
+  }
+
 }

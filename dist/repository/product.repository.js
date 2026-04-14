@@ -1,73 +1,72 @@
 import prisma from "../utils/prisma";
-import {} from "../models/product.mode";
-export const findAll = async (skip, take, where, orderBy) => {
-    return await prisma.product.findMany({
-        skip,
-        take,
-        where,
-        orderBy,
-        include: { category: true }, // Relation selalu di repo atau service sesuai kebutuhan
-    });
-};
-export const countAll = async (where) => {
-    return await prisma.product.count({ where });
-};
-export const findById = async (id) => {
-    return await prisma.product.findUnique({
-        where: { id, deletedAt: null },
-        include: { category: true },
-    });
-};
-export const create = async (data) => {
-    return await prisma.product.create({ data });
-};
-export const update = async (id, data) => {
-    return await prisma.product.update({
-        where: { id },
-        data,
-    });
-};
-export const softDelete = async (id) => {
-    return await prisma.product.update({
-        where: { id },
-        data: { deletedAt: new Date() },
-    });
-};
 export class ProductRepository {
-    // Simulasi database (ganti dengan real DB connection)
-    products = [];
-    currentId = 1;
-    async findAll() {
-        return this.products;
+    async findAll(skip, take, where, orderBy) {
+        return prisma.product.findMany({
+            skip,
+            take,
+            where,
+            orderBy,
+            include: { category: true },
+        });
+    }
+    async countAll(where) {
+        return prisma.product.count({ where });
     }
     async findById(id) {
-        return this.products.find((p) => p.id === id);
+        return prisma.product.findFirst({
+            where: { id, deletedAt: null },
+            include: { category: true },
+        });
     }
     async create(data) {
-        const newProduct = {
-            id: this.currentId++,
-            ...data,
-            createdAt: new Date(),
-        };
-        this.products.push(newProduct);
-        return newProduct;
+        return prisma.product.create({
+            data,
+            include: { category: true },
+        });
     }
     async update(id, data) {
-        const index = this.products.findIndex((p) => p.id === id);
-        if (index === -1)
-            return null;
-        this.products[index] = {
-            ...this.products[index],
-            ...data,
-        };
-        return this.products[index];
+        return prisma.product.update({
+            where: { id },
+            data,
+            include: { category: true },
+        });
     }
-    async delete(id) {
-        const index = this.products.findIndex((p) => p.id === id);
-        if (index === -1)
-            return false;
-        this.products.splice(index, 1);
-        return true;
+    async softDelete(id) {
+        return prisma.product.update({
+            where: { id },
+            data: { deletedAt: new Date() },
+        });
+    }
+    async findComplex(categoryName, maxPrice) {
+        return await prisma.product.findMany({
+            where: {
+                OR: [
+                    {
+                        AND: [
+                            { category: { name: categoryName } },
+                            { price: { lt: maxPrice } }
+                        ]
+                    },
+                    { category: { name: 'Aksesoris' } }
+                ]
+            }
+        });
+    }
+    async getStatistics() {
+        return await prisma.product.aggregate({
+            _count: { id: true }, // Total jumlah roduct
+            _avg: { price: true }, // Rata - Rata harga
+            _sum: { stock: true }, // Total stok semua barang
+            _min: { price: true }, // Harga termurah
+            _max: { price: true } // Harga termahal
+        });
+    }
+    async getProductsByCategotyStats() {
+        return await prisma.product.groupBy({
+            by: ['categoryId'],
+            _count: { id: true },
+            _avg: { price: true }
+        });
     }
 }
 //# sourceMappingURL=product.repository.js.map

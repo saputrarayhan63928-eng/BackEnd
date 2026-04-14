@@ -10,6 +10,7 @@ const productService = new ProductService(productRepository);
 const productController = new ProductController(productService);
 
 router.get("/", productController.getProducts);
+router.get("/stats", productController.getStats)
 router.get("/:id", productController.getProduct);
 router.post("/", productController.createProduct);
 router.put("/:id", productController.updateProduct);

@@ -1,5 +1,6 @@
 import type { Prisma } from "@prisma/client";
-interface FindAllParams {
+import { TransactionRepository } from "../repository/transaction.repository";
+export interface FindAllTransactionsParams {
     page: number;
     limit: number;
     search?: {
@@ -10,8 +11,14 @@ interface FindAllParams {
     sortBy?: string;
     sortOrder?: "asc" | "desc";
 }
+export interface CheckoutItemInput {
+    productId: number;
+    quantity: number;
+}
 export declare class TransactionService {
-    static getAll(params: FindAllParams): Promise<{
+    private readonly repository;
+    constructor(repository: TransactionRepository);
+    getAllTransactions(params: FindAllTransactionsParams): Promise<{
         transactions: ({
             user: {
                 name: string;
@@ -55,10 +62,7 @@ export declare class TransactionService {
         totalPages: number;
         currentPage: number;
     }>;
-    static checkout(userId: number, items: {
-        productId: number;
-        quantity: number;
-    }[]): Promise<{
+    checkout(userId: number, items: CheckoutItemInput[]): Promise<{
         item: ({
             product: {
                 name: string;
@@ -87,7 +91,7 @@ export declare class TransactionService {
         userId: number;
         total: Prisma.Decimal;
     }>;
-    static getTransactionById(id: number): Promise<({
+    getTransactionById(id: number): Promise<({
         user: {
             name: string;
             id: number;
@@ -127,5 +131,4 @@ export declare class TransactionService {
         total: Prisma.Decimal;
     }) | null>;
 }
-export {};
 //# sourceMappingURL=transaction.service.d.ts.map

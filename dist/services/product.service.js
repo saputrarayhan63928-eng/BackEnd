@@ -1,7 +1,4 @@
-import { countAll, findAll, create, update, softDelete, ProductRepository } from "../repository/product.repository";
-import prisma from "../utils/prisma";
-import {} from "../models/product.mode";
-import { error } from "node:console";
+import { ProductRepository } from "../repository/product.repository";
 const allowedSortFields = [
     "id",
     "name",
@@ -10,107 +7,105 @@ const allowedSortFields = [
     "createdAt",
     "updatedAt",
 ];
-export class ProductServiceV2 {
+export class ProductService {
     repository;
     constructor(repository) {
         this.repository = repository;
     }
-    async getAllProducts() {
-        return await this.repository.findAll();
-    }
-    async getProductById(id) {
-        const product = await this.repository.findById(id);
-        if (!product) {
-            throw new Error(`Product with id ${id} not found`);
-        }
-        return product;
-    }
-    async createProduct(data) {
-        // Business logic: validasi
-        if (data.price <= 0) {
-            throw new Error('Price must be greater than 0');
-        }
-        if (data.stock < 0) {
-            throw new Error('Stock cannot be negative');
-        }
-        return await this.repository.create(data);
-    }
-    async updateProduct(id, data) {
-        const product = await this.repository.update(id, data);
-        if (!product) {
-            throw new Error(`Product with id ${id} not found`);
-        }
-        return product;
-    }
-    async deleteProduct(id) {
-        const deleted = await this.repository.delete(id);
-        if (!deleted) {
-            throw new Error(`Product with id ${id} not found`);
-        }
-    }
-    async checkStock(id) {
-        const product = await this.getProductById(id);
-        return (product.stock ?? 0) > 0;
-    }
-}
-export class ProductService {
-    static async getAll(params) {
+    async getAllProducts(params) {
         const { page, limit, search, sortBy, sortOrder } = params;
+        const skip = (page - 1) * limit;
         const orderByField = allowedSortFields.includes(sortBy)
             ? sortBy
             : "createdAt";
-        const skip = (page - 1) * limit;
-        // 1. Buat Filter (Where Clause)
         const whereClause = {
-            deletedAt: null, // Selalu filter yang belum dihapus (soft delete)
+            deletedAt: null,
         };
         if (search?.name) {
-            whereClause.name = { contains: search.name, mode: 'insensitive' };
-        }
-        if (search?.maxPrice) {
-            whereClause.price = {
-                lte: search.maxPrice
+            whereClause.name = {
+                contains: search.name,
+                mode: "insensitive",
             };
         }
-        const sortCriteria = sortBy ? { [sortBy]: sortOrder || "desc" } : { createdAt: "desc" };
-        //  Ambil data dgn pagination and sorting
-        const products = await findAll(skip, limit, whereClause, sortCriteria);
-        // hitung total data (untuk metadata pagination)
-        const totalItems = await countAll(whereClause);
+        if (search?.maxPrice !== undefined) {
+            whereClause.price = {
+                lte: search.maxPrice,
+            };
+        }
+        const products = await this.repository.findAll(skip, limit, whereClause, {
+            [orderByField]: sortOrder || "desc",
+        });
+        const totalItems = await this.repository.countAll(whereClause);
         return {
             products,
             totalItems,
             totalPages: Math.ceil(totalItems / limit),
-            currentPage: page
+            currentPage: page,
         };
     }
-    static async getById(id) {
-        const product = await prisma.product.findFirst({
-            where: { id, deletedAt: null },
-        });
+    async getProductById(id) {
+        const product = await this.repository.findById(id);
         if (!product) {
             throw new Error("Produk tidak ditemukan");
         }
         return product;
     }
-    static async create(data) {
-        if (data.stock < 0)
-            throw new Error('Stock Tidak boleh Negatif');
-        if (data.price < 0)
-            throw new Error('Stock Tidak boleh Negatif');
-        return await create(data);
+    async createProduct(data) {
+        if (data.price <= 0) {
+            throw new Error("Price must be greater than 0");
+        }
+        if ((data.stock ?? 0) < 0) {
+            throw new Error("Stock cannot be negative");
+        }
+        return this.repository.create({
+            name: data.name,
+            price: data.price,
+            stock: data.stock ?? 0,
+            image: data.image,
+            ...(data.description !== undefined ? { description: data.description } : {}),
+            ...(data.categoryId
+                ? {
+                    category: {
+                        connect: { id: data.categoryId },
+                    },
+                }
+                : {}),
+        });
     }
-    static async update(id, data) {
-        await this.getById(id);
-        if (data.stock < 0)
-            throw new Error('Stock Tidak boleh Negatif');
-        if (data.price < 0)
-            throw new Error('Stock Tidak boleh Negatif');
-        return await update(id, data);
+    async updateProduct(id, data) {
+        await this.getProductById(id);
+        if (data.price !== undefined && data.price <= 0) {
+            throw new Error("Price must be greater than 0");
+        }
+        if (data.stock !== undefined && data.stock < 0) {
+            throw new Error("Stock cannot be negative");
+        }
+        return this.repository.update(id, {
+            ...(data.name !== undefined ? { name: data.name } : {}),
+            ...(data.description !== undefined
+                ? { description: data.description }
+                : {}),
+            ...(data.price !== undefined ? { price: data.price } : {}),
+            ...(data.stock !== undefined ? { stock: data.stock } : {}),
+            ...(data.image !== undefined ? { image: data.image } : {}),
+            ...(data.categoryId !== undefined
+                ? data.categoryId === null
+                    ? { category: { disconnect: true } }
+                    : { category: { connect: { id: data.categoryId } } }
+                : {}),
+        });
     }
-    static async delete(id) {
-        await this.getById(id);
-        return softDelete(id);
+    async deleteProduct(id) {
+        await this.getProductById(id);
+        return this.repository.softDelete(id);
+    }
+    async execute() {
+        const stats = await this.repository.getStatistics();
+        const categoryStats = await this.repository.getProductsByCategotyStats();
+        return {
+            overview: stats,
+            byCategory: categoryStats
+        };
     }
 }
 //# sourceMappingURL=product.service.js.map

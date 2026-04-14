@@ -1,5 +1,3 @@
-import { empty } from "@prisma/client/runtime/client"
-
 abstract class Shape {
     abstract hitungLuas() : number
     abstract hitungKeliling(): number
