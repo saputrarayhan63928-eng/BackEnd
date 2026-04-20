@@ -8,8 +8,16 @@ import { errorHandler } from './middlewares/error.handler';
 import categoryRoutes from './routes/category.route';
 import transactionRouter from './routes/transaction.route'
 import authRouter from './routes/auth.route'
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './utils/swagger'; // Import config yang tadi dibuat
 
 const app = express();
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+// Redirect root ke docs (opsional)
+app.get('/', (_req, res) => {
+  res.redirect('/api-docs');
+});
 
 app.use(helmet());
 app.use(cors());
