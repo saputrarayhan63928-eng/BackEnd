@@ -7,13 +7,17 @@ export class TransactionController {
 
   listTransactions = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const page = Number(req.query.page) || 1;
-      const limit = Number(req.query.limit) || 10;
-      const userIdValue = req.query.userId;
-      const minTotalValue = req.query.minTotal;
-      const maxTotalValue = req.query.maxTotal;
-      const sortBy = req.query.sortBy as string | undefined;
-      const sortOrderValue = req.query.sortOrder as string | undefined;
+      const page = Number(req.query.page ?? req.body.page) || 1;
+      const limit = Number(req.query.limit ?? req.body.limit) || 10;
+      const userIdValue =
+        req.query.userId ?? req.body.search?.userId ?? req.body.userId;
+      const minTotalValue =
+        req.query.minTotal ?? req.body.search?.minTotal ?? req.body.minTotal;
+      const maxTotalValue =
+        req.query.maxTotal ?? req.body.search?.maxTotal ?? req.body.maxTotal;
+      const sortBy = (req.query.sortBy ?? req.body.sortBy) as string | undefined;
+      const sortOrderValue = (req.query.sortOrder ??
+        req.body.sortOrder) as string | undefined;
       const sortOrder =
         sortOrderValue === "asc" || sortOrderValue === "desc"
           ? sortOrderValue
