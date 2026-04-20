@@ -1,4 +1,9 @@
-import { type Request, type Response } from "express";
-export declare const register: (req: Request, res: Response, next: import("express").NextFunction) => void;
-export declare const login: (req: Request, res: Response, next: import("express").NextFunction) => void;
+import type { NextFunction, Request, Response } from "express";
+import { AuthService } from "../services/auth.service";
+export declare class AuthController {
+    private readonly authService;
+    constructor(authService: AuthService);
+    register: (req: Request, res: Response, next: NextFunction) => Promise<Response<any, Record<string, any>> | undefined>;
+    login: (req: Request, res: Response, next: NextFunction) => Promise<Response<any, Record<string, any>> | undefined>;
+}
 //# sourceMappingURL=auth.controller.d.ts.map

@@ -1,5 +1,5 @@
 // Class bisa implement multiple interfaces
-class User {
+export class User {
     id;
     name;
     email;
@@ -20,5 +20,4 @@ class User {
         console.log(`${this.name} telah logout`);
     }
 }
-export {};
 //# sourceMappingURL=interface.js.map

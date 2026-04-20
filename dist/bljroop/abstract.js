@@ -1,4 +1,3 @@
-import { empty } from "@prisma/client/runtime/client";
 class Shape {
     // Concrete method (boleh ada di abstract class)
     deskripsi() {
@@ -37,4 +36,5 @@ const lingkaran = new Lingkaran(7);
 const persegi = new persegiPanjang(5, 10);
 console.log(lingkaran.deskripsi());
 console.log(persegi.deskripsi());
+export {};
 //# sourceMappingURL=abstract.js.map

@@ -11,7 +11,7 @@ interface IAuthenticateble {
 }
 
 // Class bisa implement multiple interfaces
-class User implements IUser, IAuthenticateble {
+export class User implements IUser, IAuthenticateble {
     constructor(
         public id:number,
         public name: string,

@@ -1,9 +1,8 @@
-import { type Request, type Response } from "express";
-export declare const getAllProducts: (req: Request, res: Response, next: import("express").NextFunction) => void;
-export declare const getProductById: (req: Request, res: Response, next: import("express").NextFunction) => void;
-export declare const create: (req: Request, res: Response, next: import("express").NextFunction) => void;
-export declare const show: (req: Request, res: Response, next: import("express").NextFunction) => void;
-export declare const createProduct: (req: Request, res: Response, next: import("express").NextFunction) => void;
-export declare const updateProduct: (req: Request, res: Response, next: import("express").NextFunction) => void;
-export declare const deleteProduct: (req: Request, res: Response, next: import("express").NextFunction) => void;
+export declare const getAllProducts: (req: import("express").Request, res: import("express").Response, next: import("express").NextFunction) => Promise<import("express").Response<any, Record<string, any>> | undefined>;
+export declare const getProductById: (req: import("express").Request, res: import("express").Response, next: import("express").NextFunction) => Promise<import("express").Response<any, Record<string, any>> | undefined>;
+export declare const create: (req: import("express").Request, res: import("express").Response, next: import("express").NextFunction) => Promise<import("express").Response<any, Record<string, any>> | undefined>;
+export declare const show: (req: import("express").Request, res: import("express").Response, next: import("express").NextFunction) => Promise<import("express").Response<any, Record<string, any>> | undefined>;
+export declare const createProduct: (req: import("express").Request, res: import("express").Response, next: import("express").NextFunction) => Promise<import("express").Response<any, Record<string, any>> | undefined>;
+export declare const updateProduct: (req: import("express").Request, res: import("express").Response, next: import("express").NextFunction) => Promise<import("express").Response<any, Record<string, any>> | undefined>;
+export declare const deleteProduct: (req: import("express").Request, res: import("express").Response, next: import("express").NextFunction) => Promise<import("express").Response<any, Record<string, any>> | undefined>;
 //# sourceMappingURL=product.controller1.d.ts.map

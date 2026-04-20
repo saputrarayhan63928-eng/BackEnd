@@ -1,5 +1,10 @@
-import type { Request, Response } from "express";
-export declare const listTransactions: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
-export declare const checkout: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
-export declare const getDetail: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>;
+import type { NextFunction, Request, Response } from "express";
+import { TransactionService } from "../services/transaction.service";
+export declare class TransactionController {
+    private readonly transactionService;
+    constructor(transactionService: TransactionService);
+    listTransactions: (req: Request, res: Response, next: NextFunction) => Promise<Response<any, Record<string, any>> | undefined>;
+    checkout: (req: Request, res: Response, next: NextFunction) => Promise<Response<any, Record<string, any>> | undefined>;
+    getDetail: (req: Request, res: Response, next: NextFunction) => Promise<Response<any, Record<string, any>> | undefined>;
+}
 //# sourceMappingURL=transaction.controller.d.ts.map

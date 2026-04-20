@@ -124,4 +124,9 @@ export class ProductController {
       next(error);
     }
   };
+
+  getStats = async (_req: Request, res: Response) =>{
+    const stats = await this.productService.execute();
+    return successResponse(res, 'Statistik produk berhasil di ambil', stats)
+  }
 }

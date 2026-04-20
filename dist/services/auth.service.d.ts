@@ -1,23 +1,18 @@
-export declare const register: (data: {
+import { AuthRepository } from "../repository/auth.repository";
+export interface RegisterInput {
     name: string;
     email: string;
     password: string;
     role?: string;
-}) => Promise<{
-    name: string;
-    id: number;
-    createdAt: Date;
-    updatedAt: Date;
-    deletedAt: Date | null;
+}
+export interface LoginInput {
     email: string;
     password: string;
-    role: string;
-}>;
-export declare const login: (data: {
-    email: string;
-    password: string;
-}) => Promise<{
-    user: {
+}
+export declare class AuthService {
+    private readonly repository;
+    constructor(repository: AuthRepository);
+    register(data: RegisterInput): Promise<{
         name: string;
         id: number;
         createdAt: Date;
@@ -26,7 +21,19 @@ export declare const login: (data: {
         email: string;
         password: string;
         role: string;
-    };
-    token: string;
-}>;
+    }>;
+    login(data: LoginInput): Promise<{
+        user: {
+            name: string;
+            id: number;
+            createdAt: Date;
+            updatedAt: Date;
+            deletedAt: Date | null;
+            email: string;
+            password: string;
+            role: string;
+        };
+        token: string;
+    }>;
+}
 //# sourceMappingURL=auth.service.d.ts.map

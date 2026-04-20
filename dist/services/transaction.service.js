@@ -1,7 +1,11 @@
-import prisma from "../utils/prisma";
+import { TransactionRepository } from "../repository/transaction.repository";
 const allowedSortFields = ["id", "total", "createdAt", "updatedAt"];
 export class TransactionService {
-    static async getAll(params) {
+    repository;
+    constructor(repository) {
+        this.repository = repository;
+    }
+    async getAllTransactions(params) {
         const { page, limit, search, sortBy, sortOrder } = params;
         const skip = (page - 1) * limit;
         const orderByField = allowedSortFields.includes(sortBy)
@@ -19,23 +23,10 @@ export class TransactionService {
                 ...(search.maxTotal !== undefined ? { lte: search.maxTotal } : {}),
             };
         }
-        const transactions = await prisma.transaction.findMany({
-            skip,
-            take: limit,
-            where: whereClause,
-            orderBy: { [orderByField]: sortOrder || "desc" },
-            include: {
-                user: true,
-                item: {
-                    include: {
-                        product: true,
-                    },
-                },
-            },
+        const transactions = await this.repository.findAll(skip, limit, whereClause, {
+            [orderByField]: sortOrder || "desc",
         });
-        const totalItems = await prisma.transaction.count({
-            where: whereClause,
-        });
+        const totalItems = await this.repository.countAll(whereClause);
         return {
             transactions,
             totalItems,
@@ -43,67 +34,42 @@ export class TransactionService {
             currentPage: page,
         };
     }
-    static async checkout(userId, items) {
-        return await prisma.$transaction(async (tx) => {
+    async checkout(userId, items) {
+        if (!items.length) {
+            throw new Error("Item transaksi wajib diisi");
+        }
+        return this.repository.executeInTransaction(async (tx) => {
             let total = 0;
             const transactionItemsData = [];
-            //  1. Loop setiap item untuk ambil data Product asli (Harga & Stok)
             for (const item of items) {
-                const product = await tx.product.findUnique({
-                    where: { id: item.productId, deletedAt: null },
-                });
+                if (item.quantity <= 0) {
+                    throw new Error("Quantity harus lebih dari 0");
+                }
+                const product = await this.repository.findProductById(tx, item.productId);
                 if (!product) {
                     throw new Error(`Product with ID ${item.productId} not found`);
                 }
-                // Validasi Stok (Optional tapi recommended)
                 if (product.stock < item.quantity) {
                     throw new Error(`Insufficient stock for product ID ${item.productId}`);
                 }
-                // Hitung Total (Harga DB x Quantity Request)
                 const currentPrice = Number(product.price);
                 total += currentPrice * item.quantity;
-                // Siapkan data untuk disimpan ke pivot TransactionItem
                 transactionItemsData.push({
-                    productId: item.productId,
                     quantity: item.quantity,
-                    priceAtTime: product.price // PENTING: Simpan harga saat transaksi terjadi
+                    priceAtTime: product.price,
+                    product: {
+                        connect: {
+                            id: item.productId,
+                        },
+                    },
                 });
-                // Update Stok (Decrement)
-                await tx.product.update({
-                    where: { id: item.productId, deletedAt: null },
-                    data: { stock: { decrement: item.quantity } }
-                });
+                await this.repository.decrementProductStock(tx, item.productId, item.quantity);
             }
-            // 2. Buat Header Transaksi & Detail Items sekaligus (Nested Write)
-            const newTransaction = await tx.transaction.create({
-                data: {
-                    userId,
-                    total, // Total hasil perhitungan real
-                    item: {
-                        create: transactionItemsData // Insert ke table pivot
-                    }
-                },
-                include: {
-                    item: {
-                        include: { product: true } // Return response lengkap
-                    }
-                }
-            });
-            return newTransaction;
+            return this.repository.createTransaction(tx, userId, total, transactionItemsData);
         });
     }
-    static async getTransactionById(id) {
-        return await prisma.transaction.findUnique({
-            where: { id },
-            include: {
-                user: true, // Ambil data user
-                item: {
-                    include: {
-                        product: true // Di dalam item, ambil data produknya (Nested Include)
-                    }
-                }
-            }
-        });
+    async getTransactionById(id) {
+        return this.repository.findById(id);
     }
 }
 //# sourceMappingURL=transaction.service.js.map

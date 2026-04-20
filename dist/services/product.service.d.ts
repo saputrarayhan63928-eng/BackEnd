@@ -1,7 +1,6 @@
+import type { Prisma } from "@prisma/client";
 import { ProductRepository } from "../repository/product.repository";
-import type { Prisma, Product } from "@prisma/client";
-import { type IProduct, type ICreateProduct, type IUpdateProduct } from "../models/product.mode";
-interface FindAllParams {
+export interface FindAllProductsParams {
     page: number;
     limit: number;
     search?: {
@@ -11,18 +10,10 @@ interface FindAllParams {
     sortBy?: string;
     sortOrder?: "asc" | "desc";
 }
-export declare class ProductServiceV2 {
-    private repository;
-    constructor(repository: ProductRepository);
-    getAllProducts(): Promise<IProduct[]>;
-    getProductById(id: number): Promise<IProduct>;
-    createProduct(data: ICreateProduct): Promise<IProduct>;
-    updateProduct(id: number, data: IUpdateProduct): Promise<IProduct>;
-    deleteProduct(id: number): Promise<void>;
-    checkStock(id: number): Promise<boolean>;
-}
 export declare class ProductService {
-    static getAll(params: FindAllParams): Promise<{
+    private readonly repository;
+    constructor(repository: ProductRepository);
+    getAllProducts(params: FindAllProductsParams): Promise<{
         products: ({
             category: {
                 name: string;
@@ -46,10 +37,115 @@ export declare class ProductService {
         totalPages: number;
         currentPage: number;
     }>;
-    static getById(id: number): Promise<Product>;
-    static create(data: any): Promise<Product>;
-    static update(id: number, data: any): Promise<Product>;
-    static delete(id: number): Promise<Product>;
+    getProductById(id: number): Promise<{
+        category: {
+            name: string;
+            id: number;
+            createdAt: Date;
+            updatedAt: Date;
+        } | null;
+    } & {
+        name: string;
+        id: number;
+        createdAt: Date;
+        updatedAt: Date;
+        description: string | null;
+        price: Prisma.Decimal;
+        stock: number;
+        image: string;
+        categoryId: number | null;
+        deletedAt: Date | null;
+    }>;
+    createProduct(data: {
+        name: string;
+        description?: string;
+        price: number;
+        stock?: number;
+        image: string;
+        categoryId?: number;
+    }): Promise<{
+        category: {
+            name: string;
+            id: number;
+            createdAt: Date;
+            updatedAt: Date;
+        } | null;
+    } & {
+        name: string;
+        id: number;
+        createdAt: Date;
+        updatedAt: Date;
+        description: string | null;
+        price: Prisma.Decimal;
+        stock: number;
+        image: string;
+        categoryId: number | null;
+        deletedAt: Date | null;
+    }>;
+    updateProduct(id: number, data: {
+        name?: string;
+        description?: string;
+        price?: number;
+        stock?: number;
+        image?: string;
+        categoryId?: number | null;
+    }): Promise<{
+        category: {
+            name: string;
+            id: number;
+            createdAt: Date;
+            updatedAt: Date;
+        } | null;
+    } & {
+        name: string;
+        id: number;
+        createdAt: Date;
+        updatedAt: Date;
+        description: string | null;
+        price: Prisma.Decimal;
+        stock: number;
+        image: string;
+        categoryId: number | null;
+        deletedAt: Date | null;
+    }>;
+    deleteProduct(id: number): Promise<{
+        name: string;
+        id: number;
+        createdAt: Date;
+        updatedAt: Date;
+        description: string | null;
+        price: Prisma.Decimal;
+        stock: number;
+        image: string;
+        categoryId: number | null;
+        deletedAt: Date | null;
+    }>;
+    execute(): Promise<{
+        overview: Prisma.GetProductAggregateType<{
+            _count: {
+                id: true;
+            };
+            _avg: {
+                price: true;
+            };
+            _sum: {
+                stock: true;
+            };
+            _min: {
+                price: true;
+            };
+            _max: {
+                price: true;
+            };
+        }>;
+        byCategory: (Prisma.PickEnumerable<Prisma.ProductGroupByOutputType, "categoryId"[]> & {
+            _count: {
+                id: number;
+            };
+            _avg: {
+                price: Prisma.Decimal | null;
+            };
+        })[];
+    }>;
 }
-export {};
 //# sourceMappingURL=product.service.d.ts.map

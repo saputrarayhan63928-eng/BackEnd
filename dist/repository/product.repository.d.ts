@@ -1,87 +1,130 @@
 import type { Prisma } from "@prisma/client";
-import { type IProduct, type ICreateProduct, type IUpdateProduct } from "../models/product.mode";
-export declare const findAll: (skip: number, take: number, where: Prisma.ProductWhereInput, orderBy: Prisma.ProductOrderByWithRelationInput) => Promise<({
-    category: {
-        name: string;
-        id: number;
-        createdAt: Date;
-        updatedAt: Date;
-    } | null;
-} & {
-    name: string;
-    id: number;
-    createdAt: Date;
-    updatedAt: Date;
-    description: string | null;
-    price: Prisma.Decimal;
-    stock: number;
-    image: string;
-    categoryId: number | null;
-    deletedAt: Date | null;
-})[]>;
-export declare const countAll: (where: Prisma.ProductWhereInput) => Promise<number>;
-export declare const findById: (id: number) => Promise<({
-    category: {
-        name: string;
-        id: number;
-        createdAt: Date;
-        updatedAt: Date;
-    } | null;
-} & {
-    name: string;
-    id: number;
-    createdAt: Date;
-    updatedAt: Date;
-    description: string | null;
-    price: Prisma.Decimal;
-    stock: number;
-    image: string;
-    categoryId: number | null;
-    deletedAt: Date | null;
-}) | null>;
-export declare const create: (data: Prisma.ProductCreateInput) => Promise<{
-    name: string;
-    id: number;
-    createdAt: Date;
-    updatedAt: Date;
-    description: string | null;
-    price: Prisma.Decimal;
-    stock: number;
-    image: string;
-    categoryId: number | null;
-    deletedAt: Date | null;
-}>;
-export declare const update: (id: number, data: Prisma.ProductUpdateInput) => Promise<{
-    name: string;
-    id: number;
-    createdAt: Date;
-    updatedAt: Date;
-    description: string | null;
-    price: Prisma.Decimal;
-    stock: number;
-    image: string;
-    categoryId: number | null;
-    deletedAt: Date | null;
-}>;
-export declare const softDelete: (id: number) => Promise<{
-    name: string;
-    id: number;
-    createdAt: Date;
-    updatedAt: Date;
-    description: string | null;
-    price: Prisma.Decimal;
-    stock: number;
-    image: string;
-    categoryId: number | null;
-    deletedAt: Date | null;
-}>;
 export declare class ProductRepository {
-    private products;
-    private currentId;
-    findAll(): Promise<IProduct[]>;
-    findById(id: number): Promise<IProduct | undefined>;
-    create(data: ICreateProduct): Promise<IProduct>;
-    update(id: number, data: IUpdateProduct): Promise<IProduct | null>;
-    delete(id: number): Promise<boolean>;
+    findAll(skip: number, take: number, where: Prisma.ProductWhereInput, orderBy: Prisma.ProductOrderByWithRelationInput): Promise<({
+        category: {
+            name: string;
+            id: number;
+            createdAt: Date;
+            updatedAt: Date;
+        } | null;
+    } & {
+        name: string;
+        id: number;
+        createdAt: Date;
+        updatedAt: Date;
+        description: string | null;
+        price: Prisma.Decimal;
+        stock: number;
+        image: string;
+        categoryId: number | null;
+        deletedAt: Date | null;
+    })[]>;
+    countAll(where: Prisma.ProductWhereInput): Promise<number>;
+    findById(id: number): Promise<({
+        category: {
+            name: string;
+            id: number;
+            createdAt: Date;
+            updatedAt: Date;
+        } | null;
+    } & {
+        name: string;
+        id: number;
+        createdAt: Date;
+        updatedAt: Date;
+        description: string | null;
+        price: Prisma.Decimal;
+        stock: number;
+        image: string;
+        categoryId: number | null;
+        deletedAt: Date | null;
+    }) | null>;
+    create(data: Prisma.ProductCreateInput): Promise<{
+        category: {
+            name: string;
+            id: number;
+            createdAt: Date;
+            updatedAt: Date;
+        } | null;
+    } & {
+        name: string;
+        id: number;
+        createdAt: Date;
+        updatedAt: Date;
+        description: string | null;
+        price: Prisma.Decimal;
+        stock: number;
+        image: string;
+        categoryId: number | null;
+        deletedAt: Date | null;
+    }>;
+    update(id: number, data: Prisma.ProductUpdateInput): Promise<{
+        category: {
+            name: string;
+            id: number;
+            createdAt: Date;
+            updatedAt: Date;
+        } | null;
+    } & {
+        name: string;
+        id: number;
+        createdAt: Date;
+        updatedAt: Date;
+        description: string | null;
+        price: Prisma.Decimal;
+        stock: number;
+        image: string;
+        categoryId: number | null;
+        deletedAt: Date | null;
+    }>;
+    softDelete(id: number): Promise<{
+        name: string;
+        id: number;
+        createdAt: Date;
+        updatedAt: Date;
+        description: string | null;
+        price: Prisma.Decimal;
+        stock: number;
+        image: string;
+        categoryId: number | null;
+        deletedAt: Date | null;
+    }>;
+    findComplex(categoryName: string, maxPrice: number): Promise<{
+        name: string;
+        id: number;
+        createdAt: Date;
+        updatedAt: Date;
+        description: string | null;
+        price: Prisma.Decimal;
+        stock: number;
+        image: string;
+        categoryId: number | null;
+        deletedAt: Date | null;
+    }[]>;
+    getStatistics(): Promise<Prisma.GetProductAggregateType<{
+        _count: {
+            id: true;
+        };
+        _avg: {
+            price: true;
+        };
+        _sum: {
+            stock: true;
+        };
+        _min: {
+            price: true;
+        };
+        _max: {
+            price: true;
+        };
+    }>>;
+    getProductsByCategotyStats(): Promise<(Prisma.PickEnumerable<Prisma.ProductGroupByOutputType, "categoryId"[]> & {
+        _count: {
+            id: number;
+        };
+        _avg: {
+            price: Prisma.Decimal | null;
+        };
+    })[]>;
 }
 //# sourceMappingURL=product.repository.d.ts.map
