@@ -19,7 +19,7 @@ const authController = new AuthController(authService);
 
 /**
  * @swagger
- * /auth/register:
+ * /api/v1/auth/register:
  *   post:
  *     summary: Register pengguna baru
  *     tags: [Auth]
@@ -54,8 +54,36 @@ const authController = new AuthController(authService);
  *     responses:
  *       201:
  *         description: Register berhasil
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Register berhasil
+ *                 data:
+ *                   $ref: '#/components/schemas/AuthUser'
  *       400:
  *         description: Request body tidak valid
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Validasi gagal
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/ErrorItem'
  *       401:
  *         description: Header x-api-key tidak dikirim
 */
@@ -64,7 +92,7 @@ router.post("/auth/register", registerValidation, authController.register);
 
 /**
  * @swagger
- * /auth/login:
+ * /api/v1/auth/login:
  *   post:
  *     summary: Login pengguna
  *     tags: [Auth]
@@ -96,12 +124,36 @@ router.post("/auth/register", registerValidation, authController.register);
  *             schema:
  *               type: object
  *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
  *                 message:
  *                   type: string
- *                 token:
- *                   type: string
+ *                   example: Login Berhasil
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user:
+ *                       $ref: '#/components/schemas/AuthUser'
+ *                     token:
+ *                       type: string
  *       400:
  *         description: Request body tidak valid
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Validasi gagal
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/ErrorItem'
  *       401:
  *         description: Email atau password salah, atau header x-api-key tidak dikirim
  */
