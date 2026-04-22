@@ -7,16 +7,19 @@ export class ProductController {
 
   getProducts = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const page = Number(req.query.page ?? req.body.page) || 1;
-      const limit = Number(req.query.limit ?? req.body.limit) || 10;
-      const name = (req.query.name ?? req.body.search?.name ?? req.body.name) as
+      const body = req.body ?? {};
+      const bodySearch = body.search ?? {};
+
+      const page = Number(req.query.page ?? body.page) || 1;
+      const limit = Number(req.query.limit ?? body.limit) || 10;
+      const name = (req.query.name ?? bodySearch.name ?? body.name) as
         | string
         | undefined;
       const maxPriceValue =
-        req.query.maxPrice ?? req.body.search?.maxPrice ?? req.body.maxPrice;
-      const sortBy = (req.query.sortBy ?? req.body.sortBy) as string | undefined;
+        req.query.maxPrice ?? bodySearch.maxPrice ?? body.maxPrice;
+      const sortBy = (req.query.sortBy ?? body.sortBy) as string | undefined;
       const sortOrderValue = (req.query.sortOrder ??
-        req.body.sortOrder) as string | undefined;
+        body.sortOrder) as string | undefined;
       const sortOrder =
         sortOrderValue === "asc" || sortOrderValue === "desc"
           ? sortOrderValue
