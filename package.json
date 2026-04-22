@@ -5,7 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc && tsc-alias -p tsconfig.json -f -fe .js",
+    "build": "node ./node_modules/typescript/bin/tsc && node ./node_modules/tsc-alias/dist/bin/index.js -p tsconfig.json -f -fe .js",
     "start": "node dist/index.js",
     "test": "jest",
     "prisma.generate": "prisma generate",
@@ -39,7 +39,6 @@
     "prisma": "^7.4.0",
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.9",
-    "tsc": "^2.0.4",
     "tsc-alias": "^1.8.16",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
