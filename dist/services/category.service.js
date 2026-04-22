@@ -1,4 +1,4 @@
-import { CategoryRepository } from "../repository/category.repository";
+import { CategoryRepository } from "../repository/category.repository.js";
 const allowedSortFields = ["id", "name", "createdAt", "updatedAt"];
 export class CategoryService {
     repository;

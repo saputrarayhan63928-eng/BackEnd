@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { ProductService } from "../services/product.service";
+import { ProductService } from "../services/product.service.js";
 export declare class ProductController {
     private readonly productService;
     constructor(productService: ProductService);

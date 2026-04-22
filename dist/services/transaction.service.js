@@ -1,4 +1,4 @@
-import { TransactionRepository } from "../repository/transaction.repository";
+import { TransactionRepository } from "../repository/transaction.repository.js";
 const allowedSortFields = ["id", "total", "createdAt", "updatedAt"];
 export class TransactionService {
     repository;

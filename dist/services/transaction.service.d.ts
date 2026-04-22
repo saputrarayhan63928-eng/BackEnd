@@ -1,5 +1,5 @@
 import type { Prisma } from "@prisma/client";
-import { TransactionRepository } from "../repository/transaction.repository";
+import { TransactionRepository } from "../repository/transaction.repository.js";
 export interface FindAllTransactionsParams {
     page: number;
     limit: number;

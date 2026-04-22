@@ -1,4 +1,6 @@
-import { AuthRepository } from "../repository/auth.repository";
+import { AuthRepository } from "../repository/auth.repository.js";
+export declare const AUTH_ROLES: readonly ["ADMIN", "MEMBER"];
+export type AuthRole = (typeof AUTH_ROLES)[number];
 export interface RegisterInput {
     name: string;
     email: string;
@@ -12,27 +14,9 @@ export interface LoginInput {
 export declare class AuthService {
     private readonly repository;
     constructor(repository: AuthRepository);
-    register(data: RegisterInput): Promise<{
-        name: string;
-        id: number;
-        createdAt: Date;
-        updatedAt: Date;
-        deletedAt: Date | null;
-        email: string;
-        password: string;
-        role: string;
-    }>;
+    register(data: RegisterInput): Promise<import("../repository/auth.repository.js").AuthUser>;
     login(data: LoginInput): Promise<{
-        user: {
-            name: string;
-            id: number;
-            createdAt: Date;
-            updatedAt: Date;
-            deletedAt: Date | null;
-            email: string;
-            password: string;
-            role: string;
-        };
+        user: import("../repository/auth.repository.js").AuthUser;
         token: string;
     }>;
 }

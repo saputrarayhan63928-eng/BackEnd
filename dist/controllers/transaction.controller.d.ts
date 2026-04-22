@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { TransactionService } from "../services/transaction.service";
+import { TransactionService } from "../services/transaction.service.js";
 export declare class TransactionController {
     private readonly transactionService;
     constructor(transactionService: TransactionService);

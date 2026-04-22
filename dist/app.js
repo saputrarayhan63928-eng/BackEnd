@@ -3,12 +3,19 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 import cors from 'cors';
 import path from 'path';
-import productRoutes from './routes/product.route';
-import { errorHandler } from './middlewares/error.handler';
-import categoryRoutes from './routes/category.route';
-import transactionRouter from './routes/transaction.route';
-import authRouter from './routes/auth.route';
+import productRoutes from './routes/product.route.js';
+import { errorHandler } from './middlewares/error.handler.js';
+import categoryRoutes from './routes/category.route.js';
+import transactionRouter from './routes/transaction.route.js';
+import authRouter from './routes/auth.route.js';
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './utils/swagger.js'; // Import config yang tadi dibuat
 const app = express();
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+// Redirect root ke docs (opsional)
+app.get('/', (_req, res) => {
+    res.redirect('/api-docs');
+});
 app.use(helmet());
 app.use(cors());
 app.use(morgan('dev'));
