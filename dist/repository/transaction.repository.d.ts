@@ -9,7 +9,7 @@ export declare class TransactionRepository {
             deletedAt: Date | null;
             email: string;
             password: string;
-            role: string;
+            role: import("@prisma/client").$Enums.Role;
         };
         item: ({
             product: {
@@ -49,7 +49,7 @@ export declare class TransactionRepository {
             deletedAt: Date | null;
             email: string;
             password: string;
-            role: string;
+            role: import("@prisma/client").$Enums.Role;
         };
         item: ({
             product: {

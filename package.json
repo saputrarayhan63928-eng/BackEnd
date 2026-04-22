@@ -5,13 +5,13 @@
   "main": "index.ts",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc && tsc-alias -p tsconfig.json -f -fe .js",
+    "build": "node ./node_modules/prisma/build/index.js generate && node ./node_modules/typescript/bin/tsc && node ./node_modules/tsc-alias/dist/bin/index.js -p tsconfig.json -f -fe .js",
     "start": "node dist/index.js",
     "test": "jest",
-    "prisma.generate": "prisma generate",
-    "prisma.migrate": "prisma migrate dev",
-    "prisma.reset": "prisma migrate reset",
-    "prisma.studio": "prisma studio"
+    "prisma.generate": "node ./node_modules/prisma/build/index.js generate",
+    "prisma.migrate": "node ./node_modules/prisma/build/index.js migrate dev",
+    "prisma.reset": "node ./node_modules/prisma/build/index.js migrate reset",
+    "prisma.studio": "node ./node_modules/prisma/build/index.js studio"
   },
   "repository": {
     "type": "git",
@@ -39,7 +39,6 @@
     "prisma": "^7.4.0",
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.9",
-    "tsc": "^2.0.4",
     "tsc-alias": "^1.8.16",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
