@@ -1,5 +1,5 @@
 import type { Prisma } from "@prisma/client";
-import { ProductRepository } from "../repository/product.repository";
+import { ProductRepository } from "../repository/product.repository.js";
 export interface FindAllProductsParams {
     page: number;
     limit: number;

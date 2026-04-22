@@ -1,4 +1,4 @@
-import prisma from "../utils/prisma";
+import prisma from "../utils/prisma.js";
 export class ProductRepository {
     async findAll(skip, take, where, orderBy) {
         return prisma.product.findMany({

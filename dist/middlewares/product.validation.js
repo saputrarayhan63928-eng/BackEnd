@@ -1,6 +1,6 @@
 import { body, param, validationResult } from 'express-validator';
 import {} from 'express';
-import { errorResponse } from '../utils/response';
+import { errorResponse } from '../utils/response.js';
 export const validate = (validations) => {
     return async (req, res, next) => {
         await Promise.all(validations.map(validation => validation.run(req)));

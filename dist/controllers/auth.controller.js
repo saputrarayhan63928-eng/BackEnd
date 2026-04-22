@@ -1,5 +1,5 @@
-import { AuthService } from "../services/auth.service";
-import { successResponse } from "../utils/response";
+import { AuthService } from "../services/auth.service.js";
+import { successResponse } from "../utils/response.js";
 export class AuthController {
     authService;
     constructor(authService) {

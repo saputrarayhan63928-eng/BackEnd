@@ -1,5 +1,5 @@
 import type { Prisma } from "@prisma/client";
-import { CategoryRepository } from "../repository/category.repository";
+import { CategoryRepository } from "../repository/category.repository.js";
 export interface FindAllCategoriesParams {
     page: number;
     limit: number;

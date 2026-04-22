@@ -1,5 +1,5 @@
 import { validationResult } from 'express-validator';
-import { errorResponse } from './response';
+import { errorResponse } from './response.js';
 export const validate = (validations) => {
     return async (req, res, next) => {
         // Jalankan semua rules validasi secara paralel

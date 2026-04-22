@@ -1,5 +1,5 @@
-import { CategoryService } from "../services/category.service";
-import { successResponse } from "../utils/response";
+import { CategoryService } from "../services/category.service.js";
+import { successResponse } from "../utils/response.js";
 export class CategoryController {
     categoryService;
     constructor(categoryService) {
@@ -7,11 +7,12 @@ export class CategoryController {
     }
     listCategories = async (req, res, next) => {
         try {
-            const page = Number(req.query.page) || 1;
-            const limit = Number(req.query.limit) || 10;
-            const name = req.query.name;
-            const sortBy = req.query.sortBy;
-            const sortOrderValue = req.query.sortOrder;
+            const page = Number(req.query.page ?? req.body.page) || 1;
+            const limit = Number(req.query.limit ?? req.body.limit) || 10;
+            const name = (req.query.name ?? req.body.search?.name ?? req.body.name);
+            const sortBy = (req.query.sortBy ?? req.body.sortBy);
+            const sortOrderValue = (req.query.sortOrder ??
+                req.body.sortOrder);
             const sortOrder = sortOrderValue === "asc" || sortOrderValue === "desc"
                 ? sortOrderValue
                 : undefined;

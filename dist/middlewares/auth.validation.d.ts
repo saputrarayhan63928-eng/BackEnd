@@ -1,0 +1,3 @@
+export declare const registerValidation: (req: import("express").Request, res: import("express").Response, next: import("express").NextFunction) => Promise<void | import("express").Response<any, Record<string, any>>>;
+export declare const loginValidation: (req: import("express").Request, res: import("express").Response, next: import("express").NextFunction) => Promise<void | import("express").Response<any, Record<string, any>>>;
+//# sourceMappingURL=auth.validation.d.ts.map
